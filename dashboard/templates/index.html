@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ chama_name }} - Chama Keeper</title>
+<meta name="chama-name" content="{{ chama_name }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --warm-bg: #FBF3E4;
+    --card-bg: #FFFFFF;
+    --accent: #C1502E;
+    --accent-dark: #8F3A20;
+    --gold: #E0A94B;
+    --gold-deep: #C98A2C;
+    --green: #3C7A4B;
+    --green-deep: #2C5C39;
+    --green-bg: #E7F3EA;
+    --amber: #B8860B;
+    --amber-bg: #FBF1DC;
+    --red: #B23A2E;
+    --red-bg: #FBE9E7;
+    --indigo: #3A4A6B;
+    --grey: #6B6157;
+    --grey-bg: #EFE9DE;
+    --text: #3A2E28;
+    --muted: #8A7A6D;
+    --border: #EEDFC9;
+    --font-display: 'Ubuntu', 'Segoe UI', sans-serif;
+    --font-body: 'Nunito Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    background:
+      radial-gradient(circle at 100% 0%, rgba(224, 169, 75, 0.10) 0%, transparent 45%),
+      radial-gradient(circle at 0% 100%, rgba(60, 122, 75, 0.08) 0%, transparent 40%),
+      var(--warm-bg);
+    color: var(--text);
+  }
+  h1, h2, h3 { font-family: var(--font-display); }
+  .pattern-band {
+    height: 7px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--gold) 0, var(--gold) 12px,
+      var(--accent) 12px, var(--accent) 24px,
+      var(--green) 24px, var(--green) 36px,
+      var(--indigo) 36px, var(--indigo) 48px
+    );
+  }
+  header {
+    position: relative;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: #fff;
+    padding: 30px 32px 26px;
+    overflow: hidden;
+  }
+  header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.10;
+    background-image:
+      linear-gradient(45deg, #fff 25%, transparent 25%),
+      linear-gradient(-45deg, #fff 25%, transparent 25%);
+    background-size: 34px 34px;
+    background-position: 0 0, 17px 17px;
+    pointer-events: none;
+  }
+  .header-inner {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  }
+  header p { margin: 7px 0 0; opacity: 0.92; font-size: 0.97rem; }
+  .lang-toggle {
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    padding: 3px;
+    flex-shrink: 0;
+  }
+  .lang-toggle button {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .lang-toggle button.active {
+    background: #fff;
+    color: var(--accent-dark);
+  }
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 800px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+  .card {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 14px rgba(60, 40, 20, 0.07);
+    transition: box-shadow 0.2s ease;
+  }
+  .card:hover { box-shadow: 0 6px 20px rgba(60, 40, 20, 0.11); }
+  .card.card-disputes { border-left-color: var(--red); }
+  .card.card-rotation { border-left-color: var(--gold-deep); }
+  .card.card-balances { border-left-color: var(--green); }
+  .card.card-activity { border-left-color: var(--indigo); }
+  .card.card-submit { border-left-color: var(--green); }
+  .card h2 {
+    margin-top: 0;
+    font-size: 1.18rem;
+    font-weight: 500;
+    color: var(--accent-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 9px 8px; font-size: 0.92rem; vertical-align: top; }
+  th {
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 2px solid var(--border);
+  }
+  tr.data-row:not(:last-child) td { border-bottom: 1px solid #F5EBDA; }
+  tr.data-row { transition: background 0.12s ease; }
+  tr.data-row:hover { background: #FDF8EF; }
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03);
+  }
+  .badge.paid { background: var(--green-bg); color: var(--green-deep); }
+  .badge.partial { background: var(--amber-bg); color: var(--amber); }
+  .badge.pending { background: var(--grey-bg); color: var(--grey); }
+  .badge.flagged { background: var(--red-bg); color: var(--red); }
+  .badge.neutral { background: var(--grey-bg); color: var(--grey); }
+  .rotation-list { list-style: none; padding: 0; margin: 0; }
+  .rotation-list li {
+    padding: 11px 14px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background: #FAF3E7;
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-display);
+    transition: transform 0.12s ease;
+  }
+  .rotation-list li.next {
+    background: linear-gradient(90deg, var(--gold), var(--gold-deep));
+    border-color: var(--gold-deep);
+    color: #4A3200;
+    font-weight: 700;
+    box-shadow: 0 3px 10px rgba(201, 138, 44, 0.35);
+    transform: scale(1.02);
+  }
+  #payout-banner {
+    background: linear-gradient(135deg, var(--green), var(--green-deep));
+    color: #fff;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    box-shadow: 0 4px 14px rgba(44, 92, 57, 0.3);
+  }
+  #payout-banner .headline {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 3px;
+  }
+  #payout-history {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  #payout-history .history-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+  .dispute {
+    border-left: 4px solid var(--red);
+    background: var(--red-bg);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+  }
+  .dispute .who { font-weight: 700; color: var(--red); }
+  .dispute .reason { font-size: 0.9rem; margin-top: 4px; color: var(--text); }
+  .dispute-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .resolve-btn {
+    background: #fff;
+    border: 1px solid var(--red);
+    color: var(--red);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .resolve-btn:hover { background: var(--red); color: #fff; }
+  .resolve-form {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(178, 58, 46, 0.3);
+  }
+  .resolve-form input[type="text"] {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    margin-bottom: 8px;
+    font-family: inherit;
+  }
+  .resolve-form label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+  .resolve-form .submit-btn {
+    background: var(--green);
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .empty-note { color: var(--muted); font-style: italic; font-size: 0.9rem; }
+  button.run-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(193, 80, 46, 0.3);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  button.run-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(193, 80, 46, 0.4); }
+  button.run-btn:active { transform: translateY(0); }
+  button.run-btn:disabled { opacity: 0.6; cursor: wait; transform: none; box-shadow: none; }
+  #mpesa-input {
+    width: 100%;
+    min-height: 70px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.15s ease;
+  }
+  #mpesa-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(193, 80, 46, 0.12);
+  }
+  button.payout-btn {
+    background: linear-gradient(135deg, var(--green), var(--green-deep));
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(60, 122, 75, 0.3);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    margin-left: 10px;
+  }
+  button.payout-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(60, 122, 75, 0.4); }
+  #run-status { margin-left: 12px; color: var(--muted); font-size: 0.9rem; }
+  .cycle-tag {
+    background: #EFE3D0;
+    color: var(--accent-dark);
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .detail-toggle {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 2px 4px;
+  }
+  .detail-toggle:hover { text-decoration: underline; }
+  tr.detail-row td {
+    background: #FAF3E7;
+    border-radius: 8px;
+    font-size: 0.87rem;
+    line-height: 1.5;
+    padding: 10px 14px;
+    white-space: pre-wrap;
+  }
+  .action-label {
+    text-transform: capitalize;
+    font-weight: 600;
+  }
+  .balance-cell { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <h1>🤝 {{ chama_name }}</h1>
+      <p data-i18n="tagline">Chama Keeper - protecting trust between members, one contribution at a time.</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button type="button" id="lang-en" class="active" onclick="setLanguage('en')">English</button>
+      <button type="button" id="lang-sw" onclick="setLanguage('sw')">Kiswahili</button>
+    </div>
+  </div>
+</header>
+<div class="pattern-band"></div>
+
+<main>
+
+  <div class="card">
+    <h2 data-i18n="demoControls">Live Demo Controls</h2>
+    <button class="run-btn" id="run-btn" onclick="triggerRun()" data-i18n="runAgent">▶ Run Agent Now</button>
+    <button class="payout-btn" id="payout-btn" onclick="triggerPayout()" data-i18n="calculatePayout">💰 Calculate Payout</button>
+    <span id="run-status"></span>
+    <p class="empty-note" style="margin-top:10px;" data-i18n="demoNote">
+      Processes the sample M-Pesa messages live through the agent (real Bedrock calls) and
+      updates everything below. Safe to click more than once - state resets each run.
+    </p>
+  </div>
+
+  <div class="card card-submit">
+    <h2 data-i18n="submitMpesa">Submit an M-Pesa Confirmation</h2>
+    <p class="empty-note" style="margin-top:0;" data-i18n="submitMpesaNote">
+      Paste a live M-Pesa confirmation SMS below to reconcile it on top of the current
+      state - e.g. a member completing a partial balance.
+    </p>
+    <textarea id="mpesa-input" data-i18n-placeholder="mpesaPlaceholder" placeholder="QFTX1 Confirmed. Ksh200.00 received from CHEBET KIPLAGAT 254712345674 on 12/9/26 at 11:00 AM."></textarea>
+    <div style="margin-top:10px;">
+      <button class="run-btn" id="submit-payment-btn" onclick="submitPayment()" data-i18n="submitPayment">Submit Payment</button>
+      <span id="submit-payment-status"></span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2><span data-i18n="membersCycle">Members - Cycle</span> <span class="cycle-tag" id="cycle-number">1</span></h2>
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="colName">Name</th>
+              <th data-i18n="colPhone">Phone</th>
+              <th data-i18n="colOwes">Owes</th>
+              <th data-i18n="colPaid">Paid</th>
+              <th data-i18n="colBalance">Balance</th>
+              <th data-i18n="colStatus">Status</th>
+            </tr>
+          </thead>
+          <tbody id="members-table-body">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card card-disputes">
+        <h2 data-i18n="disputesQueue">⚠️ Disputes Queue - needs treasurer review</h2>
+        <div id="disputes-list">
+          <p class="empty-note" data-i18n="noDisputesYet">No disputes yet. Run the agent to process sample messages.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card card-rotation">
+        <h2 data-i18n="payoutRotation">Payout Rotation</h2>
+        <div id="payout-banner" hidden></div>
+        <ul class="rotation-list" id="rotation-list"></ul>
+        <div id="payout-history"></div>
+      </div>
+
+      <div class="card card-balances">
+        <h2 data-i18n="balances">Balances</h2>
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="colName">Name</th>
+              <th data-i18n="colBalanceRemaining">Balance Remaining</th>
+            </tr>
+          </thead>
+          <tbody id="balances-table-body">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-activity">
+    <h2 data-i18n="activityLog">Agent Activity Log</h2>
+    <table>
+      <thead>
+        <tr>
+          <th data-i18n="colMember">Member</th>
+          <th data-i18n="colAction">Action</th>
+          <th data-i18n="colAmount">Amount</th>
+          <th data-i18n="colStatus">Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="activity-log-body">
+        <tr><td colspan="5" class="empty-note" data-i18n="activityEmpty">Click "Run Agent Now" to see the agent's decisions here.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<script>
+const CHAMA_NAME = document.querySelector('meta[name="chama-name"]').content;
+
+const I18N = {
+  en: {
+    pageTitle: CHAMA_NAME + " - Chama Keeper",
+    tagline: "Chama Keeper - protecting trust between members, one contribution at a time.",
+    demoControls: "Live Demo Controls",
+    runAgent: "▶ Run Agent Now",
+    calculatePayout: "💰 Calculate Payout",
+    demoNote: "Processes the sample M-Pesa messages live through the agent (real Bedrock calls) and updates everything below. Safe to click more than once - state resets each run.",
+    submitMpesa: "Submit an M-Pesa Confirmation",
+    submitMpesaNote: "Paste a live M-Pesa confirmation SMS below to reconcile it on top of the current state - e.g. a member completing a partial balance.",
+    mpesaPlaceholder: "QFTX1 Confirmed. Ksh200.00 received from CHEBET KIPLAGAT 254712345674 on 12/9/26 at 11:00 AM.",
+    submitPayment: "Submit Payment",
+    membersCycle: "Members - Cycle",
+    colName: "Name",
+    colPhone: "Phone",
+    colOwes: "Owes",
+    colPaid: "Paid",
+    colBalance: "Balance",
+    colStatus: "Status",
+    colMember: "Member",
+    colAction: "Action",
+    colAmount: "Amount",
+    colBalanceRemaining: "Balance Remaining",
+    disputesQueue: "⚠️ Disputes Queue - needs treasurer review",
+    noDisputesYet: "No disputes yet. Run the agent to process sample messages.",
+    noDisputesClear: "No open disputes. All clear!",
+    payoutRotation: "Payout Rotation",
+    balances: "Balances",
+    activityLog: "Agent Activity Log",
+    activityEmpty: 'Click "Run Agent Now" to see the agent\'s decisions here.',
+    activityEmptyAlt: 'No activity yet. Click "Run Agent Now" to process the sample M-Pesa messages.',
+    nextUp: "NEXT UP",
+    payoutIssued: "🎉 Payout issued - Cycle",
+    payoutAdvanced: "received {amount}. Rotation has advanced.",
+    payoutHistory: "Payout history",
+    cycleLabel: "Cycle",
+    settled: "Ksh0 - settled",
+    resolve: "Resolve",
+    resolutionPlaceholder: "Resolution note (e.g. confirmed with member by phone)...",
+    markPaid: "Mark as paid in full",
+    submitResolution: "Submit resolution",
+    resolving: "Resolving...",
+    details: "▸ Details",
+    hide: "▾ Hide",
+    statusPaid: "✓ Paid",
+    statusPartial: "◐ Partial",
+    statusPending: "⏳ Pending",
+    working: "Working...",
+    done: "Done.",
+    runningAgent: "Running agent on sample M-Pesa messages... (calling Bedrock)",
+    runError: "Error running agent - check the server console.",
+    calculatingPayout: "Asking agent to calculate payout...",
+    payoutError: "Error calculating payout - check the server console.",
+    pasteFirst: "Paste a confirmation message first.",
+    reconciling: "Reconciling... (calling Bedrock)",
+    submitError: "Error submitting payment - check the server console.",
+    resolveNoteRequired: "Please add a short resolution note before submitting.",
+    resolveError: "Error resolving dispute - check the server console.",
+    tokenPrompt: "Enter the demo access code:",
+    tokenInvalid: "Access code was incorrect. Try again.",
+  },
+  sw: {
+    pageTitle: CHAMA_NAME + " - Chama Keeper",
+    tagline: "Chama Keeper - kulinda imani kati ya wanachama, mchango mmoja kwa wakati.",
+    demoControls: "Vidhibiti vya Onyesho",
+    runAgent: "▶ Anza Wakala Sasa",
+    calculatePayout: "💰 Hesabu Malipo",
+    demoNote: "Inachakata ujumbe wa mfano wa M-Pesa kupitia wakala (simu halisi za Bedrock) na kusasisha kila kitu hapa chini. Unaweza kubofya zaidi ya mara moja - hali inaanza upya kila wakati.",
+    submitMpesa: "Wasilisha Uthibitisho wa M-Pesa",
+    submitMpesaNote: "Bandika SMS ya uthibitisho wa M-Pesa hapa chini ili kuilinganisha na hali ya sasa - mfano mwanachama akimaliza salio la sehemu.",
+    mpesaPlaceholder: "QFTX1 Imethibitishwa. Ksh200.00 imepokelewa kutoka CHEBET KIPLAGAT 254712345674 tarehe 12/9/26 saa 11:00 AM.",
+    submitPayment: "Wasilisha Malipo",
+    membersCycle: "Wanachama - Mzunguko",
+    colName: "Jina",
+    colPhone: "Simu",
+    colOwes: "Anadaiwa",
+    colPaid: "Amelipa",
+    colBalance: "Salio",
+    colStatus: "Hali",
+    colMember: "Mwanachama",
+    colAction: "Hatua",
+    colAmount: "Kiasi",
+    colBalanceRemaining: "Salio Lililobaki",
+    disputesQueue: "⚠️ Foleni ya Migogoro - inahitaji ukaguzi wa mweka hazina",
+    noDisputesYet: "Hakuna migogoro bado. Anza wakala ili kuchakata ujumbe wa mfano.",
+    noDisputesClear: "Hakuna migogoro wazi. Kila kitu kiko sawa!",
+    payoutRotation: "Mzunguko wa Malipo",
+    balances: "Salio",
+    activityLog: "Kumbukumbu ya Shughuli za Wakala",
+    activityEmpty: 'Bofya "Anza Wakala Sasa" kuona maamuzi ya wakala hapa.',
+    activityEmptyAlt: 'Hakuna shughuli bado. Bofya "Anza Wakala Sasa" kuchakata ujumbe wa mfano wa M-Pesa.',
+    nextUp: "INAYOFUATA",
+    payoutIssued: "🎉 Malipo yametolewa - Mzunguko",
+    payoutAdvanced: "amepokea {amount}. Mzunguko umeendelea.",
+    payoutHistory: "Historia ya malipo",
+    cycleLabel: "Mzunguko",
+    settled: "Ksh0 - imekamilika",
+    resolve: "Tatua",
+    resolutionPlaceholder: "Maelezo ya utatuzi (mfano imethibitishwa na mwanachama kwa simu)...",
+    markPaid: "Weka alama amelipa kikamilifu",
+    submitResolution: "Wasilisha utatuzi",
+    resolving: "Inatatua...",
+    details: "▸ Maelezo",
+    hide: "▾ Ficha",
+    statusPaid: "✓ Amelipa",
+    statusPartial: "◐ Sehemu",
+    statusPending: "⏳ Inasubiri",
+    working: "Inafanya kazi...",
+    done: "Imekamilika.",
+    runningAgent: "Inaendesha wakala kwenye ujumbe wa mfano wa M-Pesa... (inapiga simu Bedrock)",
+    runError: "Hitilafu kuendesha wakala - angalia console ya seva.",
+    calculatingPayout: "Inamuomba wakala kuhesabu malipo...",
+    payoutError: "Hitilafu kuhesabu malipo - angalia console ya seva.",
+    pasteFirst: "Bandika ujumbe wa uthibitisho kwanza.",
+    reconciling: "Inalinganisha... (inapiga simu Bedrock)",
+    submitError: "Hitilafu kuwasilisha malipo - angalia console ya seva.",
+    resolveNoteRequired: "Tafadhali ongeza maelezo mafupi ya utatuzi kabla ya kuwasilisha.",
+    resolveError: "Hitilafu kutatua mgogoro - angalia console ya seva.",
+    tokenPrompt: "Ingiza msimbo wa ufikiaji wa onyesho:",
+    tokenInvalid: "Msimbo wa ufikiaji si sahihi. Jaribu tena.",
+  },
+};
+
+const STATUS_RESULT_MAP = {
+  "Paid in full": { sw: "Amelipa kikamilifu" },
+  "Reminder composed": { sw: "Ukumbusho umeandaliwa" },
+  "Blocked - balances outstanding": { sw: "Imezuiwa - salio limesalia" },
+  "Blocked - unresolved disputes": { sw: "Imezuiwa - migogoro haijatatuliwa" },
+  "Payout issued": { sw: "Malipo yametolewa" },
+  "Flagged for review": { sw: "Imewekwa alama kwa ukaguzi" },
+  "Dispute resolved": { sw: "Mgogoro umetatuliwa" },
+  "Dispute resolved - marked paid": { sw: "Mgogoro umetatuliwa - amewekwa alama amelipa" },
+};
+
+let currentLang = localStorage.getItem("chama-lang") || "en";
+let lastState = null;
+let demoToken = localStorage.getItem("chama-demo-token") || "";
+
+// Wraps fetch() for the four routes that trigger a real Bedrock call
+// (trigger-run, submit-payment, calculate-payout, resolve-dispute), which
+// the backend gates behind a shared access token so a publicly deployed
+// copy of this app can't have its AWS bill run up by random visitors. On a
+// 401 (missing/wrong token) this prompts for the code and retries once.
+async function protectedFetch(url, options = {}) {
+  options.headers = Object.assign({}, options.headers, { "X-Demo-Token": demoToken });
+  let res = await fetch(url, options);
+  if (res.status === 401) {
+    const promptText = demoToken ? t("tokenInvalid") + "\n" + t("tokenPrompt") : t("tokenPrompt");
+    const entered = prompt(promptText);
+    if (!entered) throw new Error("demo token required");
+    demoToken = entered;
+    localStorage.setItem("chama-demo-token", demoToken);
+    options.headers["X-Demo-Token"] = demoToken;
+    res = await fetch(url, options);
+    if (res.status === 401) throw new Error("demo token still invalid");
+  }
+  return res;
+}
+
+function t(key) {
+  return (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
+}
+
+function translateStatusResult(statusResult) {
+  if (!statusResult || currentLang === "en") return statusResult;
+  const mapped = STATUS_RESULT_MAP[statusResult];
+  if (mapped) return mapped.sw;
+  const remainingMatch = statusResult.match(/^Ksh(\d+) remaining$/);
+  if (remainingMatch) return `Ksh${remainingMatch[1]} imesalia`;
+  return statusResult;
+}
+
+function applyStaticTranslations() {
+  document.documentElement.lang = currentLang === "sw" ? "sw" : "en";
+  document.title = t("pageTitle");
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    el.textContent = t(el.getAttribute("data-i18n"));
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    el.placeholder = t(el.getAttribute("data-i18n-placeholder"));
+  });
+  document.getElementById("lang-en").classList.toggle("active", currentLang === "en");
+  document.getElementById("lang-sw").classList.toggle("active", currentLang === "sw");
+}
+
+function setLanguage(lang) {
+  if (lang !== "en" && lang !== "sw") return;
+  currentLang = lang;
+  localStorage.setItem("chama-lang", lang);
+  applyStaticTranslations();
+  if (lastState) renderState(lastState);
+}
+
+function currencyKsh(amount) {
+  if (amount === null || amount === undefined) return "—";
+  return "Ksh" + Math.round(amount).toLocaleString();
+}
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text == null ? "" : text;
+  return div.innerHTML;
+}
+
+function memberStatusBadge(status) {
+  const labels = {
+    paid: t("statusPaid"),
+    partial: t("statusPartial"),
+    pending: t("statusPending"),
+  };
+  return `<span class="badge ${status}">${labels[status] || status}</span>`;
+}
+
+// Maps a short status_result string from the activity log to a badge color,
+// per the treasurer-facing convention: green = resolved/paid, amber = balance
+// remaining, red = needs treasurer review, grey = informational (nudge/payout).
+// Checks "not sent" / "not delivered" / "ready" BEFORE the generic "sent"
+// check - otherwise "Not sent - ..." matches the "sent" substring and gets
+// mis-colored green as if it succeeded.
+function activityStatusBadge(statusResult) {
+  const s = (statusResult || "").toLowerCase();
+  let cls = "neutral";
+  if (s.includes("flagged") || s.includes("blocked") || s.includes("not delivered")) cls = "flagged";
+  else if (s.includes("remaining")) cls = "partial";
+  else if (s.includes("not sent") || s.includes("ready")) cls = "neutral";
+  else if (s.includes("paid in full") || s.includes("sent") || s.includes("issued")) cls = "paid";
+  const label = translateStatusResult(statusResult);
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function renderState(state) {
+  lastState = state;
+  document.getElementById("cycle-number").textContent = state.cycle_number;
+
+  const tbody = document.getElementById("members-table-body");
+  tbody.innerHTML = "";
+  state.members.forEach(m => {
+    const tr = document.createElement("tr");
+    tr.className = "data-row";
+    tr.innerHTML = `
+      <td>${m.name}</td>
+      <td>${m.phone}</td>
+      <td>${currencyKsh(m.amount_expected)}</td>
+      <td>${currencyKsh(m.amount_paid)}</td>
+      <td class="balance-cell">${m.balance > 0 ? currencyKsh(m.balance) : "—"}</td>
+      <td>${memberStatusBadge(m.status)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const rotationList = document.getElementById("rotation-list");
+  rotationList.innerHTML = "";
+  state.rotation_order.forEach((name, idx) => {
+    const li = document.createElement("li");
+    if (idx === 0) li.className = "next";
+    li.innerHTML = `<span>${idx + 1}. ${name}</span>${idx === 0 ? `<span>${t("nextUp")}</span>` : ''}`;
+    rotationList.appendChild(li);
+  });
+
+  const payoutHistory = state.payout_history || [];
+  const banner = document.getElementById("payout-banner");
+  if (payoutHistory.length > 0) {
+    const latest = payoutHistory[payoutHistory.length - 1];
+    banner.hidden = false;
+    banner.innerHTML = `
+      <span class="headline">${t("payoutIssued")} ${latest.cycle}</span>
+      ${latest.recipient} ${t("payoutAdvanced").replace("{amount}", currencyKsh(latest.amount))}
+    `;
+  } else {
+    banner.hidden = true;
+  }
+
+  const historyDiv = document.getElementById("payout-history");
+  historyDiv.innerHTML = "";
+  if (payoutHistory.length > 0) {
+    const title = document.createElement("div");
+    title.style.fontWeight = "600";
+    title.style.marginBottom = "4px";
+    title.style.color = "var(--text)";
+    title.textContent = t("payoutHistory");
+    historyDiv.appendChild(title);
+    payoutHistory.forEach(p => {
+      const row = document.createElement("div");
+      row.className = "history-row";
+      row.innerHTML = `<span>${t("cycleLabel")} ${p.cycle}: ${p.recipient}</span><span>${currencyKsh(p.amount)}</span>`;
+      historyDiv.appendChild(row);
+    });
+  }
+
+  const balancesBody = document.getElementById("balances-table-body");
+  balancesBody.innerHTML = "";
+  state.members.forEach(m => {
+    const tr = document.createElement("tr");
+    tr.className = "data-row";
+    const nameTd = document.createElement("td");
+    nameTd.textContent = m.name;
+    const balanceTd = document.createElement("td");
+    balanceTd.className = "balance-cell";
+    if (m.balance > 0) {
+      balanceTd.innerHTML = `<span class="badge partial">${currencyKsh(m.balance)}</span>`;
+    } else {
+      balanceTd.innerHTML = `<span class="badge paid">${t("settled")}</span>`;
+    }
+    tr.appendChild(nameTd);
+    tr.appendChild(balanceTd);
+    balancesBody.appendChild(tr);
+  });
+
+  renderDisputes(state.disputes || []);
+
+  renderActivityLog(state.activity_log || []);
+}
+
+function renderDisputes(disputes) {
+  const disputesDiv = document.getElementById("disputes-list");
+  disputesDiv.innerHTML = "";
+
+  if (disputes.length === 0) {
+    disputesDiv.innerHTML = `<p class="empty-note">${t("noDisputesClear")}</p>`;
+    return;
+  }
+
+  disputes.forEach((d, idx) => {
+    const div = document.createElement("div");
+    div.className = "dispute";
+
+    const header = document.createElement("div");
+    header.className = "dispute-header";
+    const who = document.createElement("div");
+    who.className = "who";
+    who.textContent = d.member;
+    const resolveBtn = document.createElement("button");
+    resolveBtn.className = "resolve-btn";
+    resolveBtn.textContent = t("resolve");
+    resolveBtn.addEventListener("click", () => {
+      const form = div.querySelector(".resolve-form");
+      form.hidden = !form.hidden;
+    });
+    header.appendChild(who);
+    header.appendChild(resolveBtn);
+
+    const reason = document.createElement("div");
+    reason.className = "reason";
+    reason.textContent = d.reason;
+
+    const form = document.createElement("div");
+    form.className = "resolve-form";
+    form.hidden = true;
+
+    const noteInput = document.createElement("input");
+    noteInput.type = "text";
+    noteInput.placeholder = t("resolutionPlaceholder");
+
+    const checkboxLabel = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkboxLabel.appendChild(checkbox);
+    checkboxLabel.appendChild(document.createTextNode(t("markPaid")));
+
+    const submitBtn = document.createElement("button");
+    submitBtn.className = "submit-btn";
+    submitBtn.textContent = t("submitResolution");
+    submitBtn.addEventListener("click", () => submitResolve(d.member, noteInput.value, checkbox.checked, submitBtn));
+
+    form.appendChild(noteInput);
+    form.appendChild(checkboxLabel);
+    form.appendChild(submitBtn);
+
+    div.appendChild(header);
+    div.appendChild(reason);
+    div.appendChild(form);
+    disputesDiv.appendChild(div);
+  });
+}
+
+async function submitResolve(memberName, resolutionNote, markAsPaid, submitBtn) {
+  if (!resolutionNote.trim()) {
+    alert(t("resolveNoteRequired"));
+    return;
+  }
+  submitBtn.disabled = true;
+  submitBtn.textContent = t("resolving");
+  try {
+    const res = await protectedFetch("/api/resolve-dispute", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        member_name: memberName,
+        resolution_note: resolutionNote,
+        mark_as_paid: markAsPaid,
+      }),
+    });
+    const data = await res.json();
+    renderState(data.state);
+  } catch (err) {
+    alert(t("resolveError"));
+    console.error(err);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = t("submitResolution");
+  }
+}
+
+function renderActivityLog(entries) {
+  const tbody = document.getElementById("activity-log-body");
+  tbody.innerHTML = "";
+
+  if (entries.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-note">${t("activityEmptyAlt")}</td></tr>`;
+    return;
+  }
+
+  entries.forEach((entry, idx) => {
+    const row = document.createElement("tr");
+    row.className = "data-row";
+    row.innerHTML = `
+      <td>${entry.member || "—"}</td>
+      <td class="action-label">${entry.action}</td>
+      <td>${currencyKsh(entry.amount)}</td>
+      <td>${activityStatusBadge(entry.status_result)}</td>
+      <td><button class="detail-toggle" onclick="toggleDetail(${idx})" id="toggle-${idx}">▸ Details</button></td>
+    `;
+    tbody.appendChild(row);
+
+    const detailRow = document.createElement("tr");
+    detailRow.className = "detail-row";
+    detailRow.id = `detail-${idx}`;
+    detailRow.hidden = true;
+    detailRow.innerHTML = `<td colspan="5">${escapeHtml(entry.full_reasoning)}</td>`;
+    tbody.appendChild(detailRow);
+  });
+}
+
+function toggleDetail(idx) {
+  const row = document.getElementById(`detail-${idx}`);
+  const toggle = document.getElementById(`toggle-${idx}`);
+  row.hidden = !row.hidden;
+  toggle.textContent = row.hidden ? "▸ Details" : "▾ Hide";
+}
+
+async function loadStatus() {
+  const res = await fetch("/api/status");
+  const state = await res.json();
+  renderState(state);
+}
+
+async function triggerRun() {
+  const btn = document.getElementById("run-btn");
+  const statusSpan = document.getElementById("run-status");
+  btn.disabled = true;
+  statusSpan.textContent = t("runningAgent");
+  document.getElementById("activity-log-body").innerHTML = `<tr><td colspan="5" class="empty-note">${t("working")}</td></tr>`;
+
+  try {
+    const res = await protectedFetch("/api/trigger-run", { method: "POST" });
+    const data = await res.json();
+    renderState(data.state);
+    statusSpan.textContent = t("done");
+  } catch (err) {
+    statusSpan.textContent = t("runError");
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function triggerPayout() {
+  const statusSpan = document.getElementById("run-status");
+  statusSpan.textContent = t("calculatingPayout");
+  try {
+    const res = await protectedFetch("/api/calculate-payout", { method: "POST" });
+    const data = await res.json();
+    renderState(data.state);
+    statusSpan.textContent = t("done");
+  } catch (err) {
+    statusSpan.textContent = t("payoutError");
+    console.error(err);
+  }
+}
+
+async function submitPayment() {
+  const input = document.getElementById("mpesa-input");
+  const message = input.value.trim();
+  const statusSpan = document.getElementById("submit-payment-status");
+
+  if (!message) {
+    statusSpan.textContent = t("pasteFirst");
+    return;
+  }
+
+  const btn = document.getElementById("submit-payment-btn");
+  btn.disabled = true;
+  statusSpan.textContent = t("reconciling");
+
+  try {
+    const res = await protectedFetch("/api/submit-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mpesa_message: message }),
+    });
+    const data = await res.json();
+    if (data.error) {
+      statusSpan.textContent = data.error;
+    } else {
+      renderState(data.state);
+      statusSpan.textContent = t("done");
+      input.value = "";
+    }
+  } catch (err) {
+    statusSpan.textContent = t("submitError");
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+applyStaticTranslations();
+loadStatus();
+</script>
+
+</body>
+</html>
