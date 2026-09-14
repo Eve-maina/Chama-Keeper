@@ -102,6 +102,30 @@ on a dispute card to submit a treasurer resolution note (with an optional "mark 
 paid" override) via `resolve_dispute`. Click **"Calculate Payout"** once everyone
 shows as paid and there are no open disputes to see the rotation advance.
 
+## Deploying on Render
+
+The repo includes `requirements.txt` and `render.yaml` for a one-click Blueprint deploy.
+
+1. On [Render](https://dashboard.render.com), click **New > Blueprint** and point it at
+   this GitHub repo. Render reads `render.yaml` and creates the web service
+   automatically (build: `pip install -r requirements.txt`, start:
+   `gunicorn dashboard.app:app --bind 0.0.0.0:$PORT`).
+2. Render will prompt you to fill in the environment variables marked `sync: false`
+   in `render.yaml` (these are intentionally not in the file, so they never touch
+   git):
+   - `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` - credentials for an IAM user/role
+     with Bedrock `Converse` access in `us-west-2`. Use a scoped-down IAM user for
+     this, not root/admin keys.
+   - `DEMO_ACCESS_TOKEN` - a real secret you choose, **not** the `chama-demo`
+     default. Every visitor to the deployed URL shares this one backend's AWS
+     credentials - there's no per-visitor billing separation - so the four
+     Bedrock-calling buttons (Run Agent Now / Submit Payment / Calculate Payout /
+     Resolve) are gated behind this token. Only share it with people you want able
+     to trigger real Bedrock calls against your account.
+3. Deploy. Render's free tier spins the service down after inactivity, so the
+   first request after idle time can take 30-50 seconds to wake up - worth
+   knowing if you're sending judges a link cold rather than demoing live.
+
 ## What the agent actually decides
 
 Given the sample M-Pesa messages in `sample_data.py`:
