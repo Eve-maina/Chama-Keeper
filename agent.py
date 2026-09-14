@@ -358,10 +358,12 @@ def calculate_payout() -> str:
         )
         return reason
 
-    # Actual money collected, not just the theoretical expected total - this
-    # naturally includes any surplus from an overpayment that was flagged
-    # but still counted once the treasurer resolves it.
-    total_payout = sum(m["amount_paid"] for m in state["members"].values())
+    # The payout is always the fixed pool - one contribution per member -
+    # not whatever was actually collected. A surplus (like a resolved
+    # duplicate-looking overpayment) isn't extra money for this cycle's
+    # recipient; it's the overpaying member's advance credit toward what
+    # they'll owe in future cycles, carried forward below.
+    total_payout = sum(m["amount_expected"] for m in state["members"].values())
     recipient = state["rotation_order"][0]
 
     state["payout_history"].append(
@@ -371,10 +373,20 @@ def calculate_payout() -> str:
     # Advance rotation: move this cycle's recipient to the back of the line.
     state["rotation_order"].append(state["rotation_order"].pop(0))
 
-    # Reset for next cycle.
+    # Reset for next cycle, carrying forward any surplus as a starting
+    # credit rather than discarding it. A member who overpaid enough to
+    # cover next cycle too (or more) starts already "paid"/"partial" with
+    # the leftover still tracked - the credit keeps cascading forward cycle
+    # over cycle until it's used up.
     for m in state["members"].values():
-        m["status"] = "pending"
-        m["amount_paid"] = 0
+        carried_credit = max(0.0, m["amount_paid"] - m["amount_expected"])
+        m["amount_paid"] = carried_credit
+        if carried_credit >= m["amount_expected"]:
+            m["status"] = "paid"
+        elif carried_credit > 0:
+            m["status"] = "partial"
+        else:
+            m["status"] = "pending"
     state["cycle_number"] += 1
 
     full_reasoning = (
